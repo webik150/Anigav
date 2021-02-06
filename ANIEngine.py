@@ -122,7 +122,7 @@ def aniInit(width, height):
     pg.init()
     pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL, display=1)
     settings.resolution = pg.display.get_window_size()
-    settings.render_res = 1080
+    settings.render_res = 400
     # glEnableClientState(GL_VERTEX_ARRAY)
     # glEnableClientState(GL_TEXTURE_COORD_ARRAY)
     settings.vao = glGenVertexArrays(1)
