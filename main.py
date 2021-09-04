@@ -1,4 +1,5 @@
 from ANIEngine import *
+from ANIInput import *
 from OpenGL import GL
 from ctypes import c_void_p
 import math
@@ -50,9 +51,12 @@ class scenedata:
 def main():
     global settings
     global model
-    settings = aniInit(1080, 10800)
+    settings = aniInit()
     settings.projection = glm.perspective(52.0, (settings.resolution[0] / settings.resolution[1]), 1.000, 100.0)
     settings.bpm = 120
+
+    im = InputManager()
+    im.start()
 
     sceneData = scenedata()
     sceneData.msh = shader("matrixGreen.vert", "matrixGreen.frag", "msh")
@@ -79,6 +83,7 @@ def main():
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                im.stop()
                 pg.quit()
                 quit()
                 return
@@ -138,6 +143,5 @@ def main():
 
         settings.timeSinceStart += settings.clock.get_time() / 1000
         settings.clock.tick(60)
-
 
 main()

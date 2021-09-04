@@ -115,7 +115,7 @@ class aniSettings:
 shaders = {}
 
 
-def aniInit(width, height):
+def aniInit():
     settings = aniSettings()
     settings.projection = glm.mat4(1)
     settings.world = glm.mat4(1)

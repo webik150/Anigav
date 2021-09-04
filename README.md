@@ -15,6 +15,15 @@ My goal is not to create some complex FT-based visualisation. I pretty much just
 * circuit for the actual input reading, but I have some wip
 * routing the values to python
 
+## Requirements
+* `adafruit-blinka`
+* `adafruit-circuitpython-mcp3xxx`
+* `numpy`
+* `pygame`
+* `pyglm`
+* `pyopengl`
+* `pyopengl-accelerate`
+* `pywavefront`
 ## Some images
 ![00](https://github.com/webik150/Anigav/blob/master/readme/img01.png)
 ![01](https://github.com/webik150/Anigav/blob/master/readme/img02.png)
