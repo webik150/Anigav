@@ -1,11 +1,18 @@
 import threading
 from collections import namedtuple
+import platform
 
 import busio
 import digitalio
-import board
-import adafruit_mcp3xxx.mcp3004 as MCP
-from adafruit_mcp3xxx.analog_in import AnalogIn
+
+if platform.system().lower().startswith('win'):
+    FAKE_MODE = True
+    import math
+elif platform.system().lower().startswith('lin'):
+    FAKE_MODE = False
+    import board
+    import adafruit_mcp3xxx.mcp3004 as MCP
+    from adafruit_mcp3xxx.analog_in import AnalogIn
 import time
 
 ##################################################
@@ -20,11 +27,11 @@ from typing import List
 
 
 def convert_range(value, oldmin, oldmax, newmin, newmax):
-    return (((value - oldmin) * (newmax - newmin)) / (oldmax - oldmin)) + newmin
+    return (((value - oldmin) * (newmax - newmin)) / (max(oldmax, 0.01) - oldmin)) + newmin
 
 
 class InputChannel:
-    chtype = namedtuple("Channel Type", ["General", "Pitch", "Clock", "Gate", "Audio"])(0, 1, 2, 3, 4)
+    chtype = namedtuple("chtype", ["General", "Pitch", "Clock", "Gate", "Audio"])(0, 1, 2, 3, 4)
 
     def __init__(self, chtype=0, pin=0):
         self.type = chtype
@@ -53,11 +60,31 @@ class InputChannel:
 
 
 def listener_thread(channels: List[InputChannel]):
-    spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
-    cs = digitalio.DigitalInOut(board.D5)
-    mcp = MCP.MCP3004(spi, cs)
-    ins = [AnalogIn(mcp, ch.pin_number) for ch in channels]
+    if FAKE_MODE:
+        class fake_in:
+            def __init__(self, speed=1.0):
+                self.speed = speed
 
+            @property
+            def voltage(self):
+                return fake_in.get_sin(self.speed)
+
+            @staticmethod
+            def get_sin(f):
+                return math.sin(time.time() * f * 2 * math.pi)
+
+            def readonly_set(self):
+                pass
+
+        ins = [fake_in(), fake_in(0.2), fake_in(0.1), fake_in()]
+    else:
+        spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
+        cs = digitalio.DigitalInOut(board.D5)
+        mcp = MCP.MCP3004(spi, cs)
+        ins = [AnalogIn(mcp, ch.pin_number) for ch in channels]
+    print(ins)
+    print(ins[0].voltage)
+    global ANI_STOPPING_THREADS
     while not ANI_STOPPING_THREADS:
         i = 0
         for ch in channels:
@@ -89,6 +116,7 @@ class InputManager:
 
     def stop(self):
         if self.thread:
+            global ANI_STOPPING_THREADS
             ANI_STOPPING_THREADS = True
             self.thread.join()
             self.thread = None

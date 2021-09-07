@@ -10,6 +10,11 @@ uniform vec2 screenSize;
 uniform lowp  int mode;
 varying vec2 v_texcoord;
 
+uniform highp float  analog1;
+uniform highp float  analog2;
+uniform highp float  analog3;
+uniform highp float  analog4;
+
 //Rotates a vector by angle
 mat2 rot(float angle) {
 	float s = sin(angle);
@@ -32,7 +37,7 @@ vec3 fractal(vec2 coords)
     bool escape = false;
     float c_r = (coords.x/screenSize.x - center_r) * scale + sin(time/5.0)/1.5;
     float c_i = (coords.y/screenSize.x - center_i) * scale + cos(time/5.0)/1.5;
-    vec2 c = rot(sin(time/5.0)*1.0) * vec2(c_r, c_i);
+    vec2 c = rot(/*sin(time/5.0)*1.0*/analog1) * vec2(c_r, c_i);
     c_r = c.x;
     c_i = c.y;
     float z_r = 0.;
