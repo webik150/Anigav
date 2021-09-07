@@ -7,6 +7,8 @@ import glm
 import pywavefront as pf
 from ctypes import c_void_p
 
+DEBUG = False
+
 
 class mesh:
     def __init__(self, msh, path, vertices, vao):
@@ -116,11 +118,12 @@ shaders = {}
 
 
 def aniInit():
+    global DEBUG
     settings = aniSettings()
     settings.projection = glm.mat4(1)
     settings.world = glm.mat4(1)
     pg.init()
-    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL, display=1)
+    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL, display=1 if DEBUG else 0)
     settings.resolution = pg.display.get_window_size()
     settings.render_res = 400
     # glEnableClientState(GL_VERTEX_ARRAY)
