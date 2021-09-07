@@ -1,0 +1,4 @@
+#!/bin/bash
+sudo python3 main.py
+read -n1 -r -p "Press a key..."
+
