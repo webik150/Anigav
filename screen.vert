@@ -5,10 +5,10 @@ uniform highp mat4  mPVM;
 varying vec2 v_texcoord;
 precision mediump float;
 
+uniform highp float  analog0;
 uniform highp float  analog1;
 uniform highp float  analog2;
 uniform highp float  analog3;
-uniform highp float  analog4;
 
 
 
