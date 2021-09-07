@@ -1,5 +1,5 @@
 # AnIGAV
-### ANalog Input Generates Audio Visuals
+### ANalog-Input-Generated Audio Visuals
 
 This project aims to create a RPiZero-powered OpenGL visualizer controllable by Eurorack CVs.
 
@@ -25,5 +25,7 @@ My goal is not to create some complex FT-based visualisation. I pretty much just
 * `pyopengl-accelerate`
 * `pywavefront`
 ## Some images
+<img src="https://github.com/webik150/Anigav/blob/master/readme/pcb1.jpg" alt="pcb image" width="512"/>
+
 ![00](https://github.com/webik150/Anigav/blob/master/readme/img01.png)
 ![01](https://github.com/webik150/Anigav/blob/master/readme/img02.png)

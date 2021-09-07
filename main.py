@@ -19,6 +19,10 @@ def drawScene(sceneData):
                        (settings.projection * settings.world * model).to_list())
     glUniform1f(glGetUniformLocation(sceneData.msh.id, "val1"), math.sin(settings.timeSinceStart / 120 * 25 * math.pi))
     glUniform1f(glGetUniformLocation(sceneData.msh.id, "bpm"), settings.bpm)
+    glUniform1f(glGetUniformLocation(sceneData.msh.id, "analog0"), sceneData.inputs.channels[0].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.msh.id, "analog1"), sceneData.inputs.channels[1].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.msh.id, "analog2"), sceneData.inputs.channels[2].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.msh.id, "analog3"), sceneData.inputs.channels[3].get_value())
     glUniform1f(glGetUniformLocation(sceneData.msh.id, "time"), settings.timeSinceStart)
     glUniform1f(glGetUniformLocation(sceneData.msh.id, "val2"),
                 math.sin(settings.timeSinceStart / 120 * 25 * math.pi) / 2 + 0.5)
@@ -36,6 +40,10 @@ def drawScene(sceneData):
                 math.sin(settings.timeSinceStart / 120 * 25 * math.pi))
     glUniform1f(glGetUniformLocation(sceneData.matrix.id, "bpm"), settings.bpm)
     glUniform1f(glGetUniformLocation(sceneData.matrix.id, "time"), settings.timeSinceStart)
+    glUniform1f(glGetUniformLocation(sceneData.matrix.id, "analog0"), sceneData.inputs.channels[0].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.matrix.id, "analog1"), sceneData.inputs.channels[1].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.matrix.id, "analog2"), sceneData.inputs.channels[2].get_value())
+    glUniform1f(glGetUniformLocation(sceneData.matrix.id, "analog3"), sceneData.inputs.channels[3].get_value())
     glUniform1f(glGetUniformLocation(sceneData.matrix.id, "val2"),
                 math.sin(settings.timeSinceStart / 120 * 25 * math.pi) / 2 + 0.5)
     glDrawElements(GL_LINES, len(sceneData.spheres[sceneData.res][0].indicesEdges) * 2, GL_UNSIGNED_INT, c_void_p(0))
@@ -62,6 +70,7 @@ def main():
     scene_data.msh = shader("matrixGreen.vert", "matrixGreen.frag", "msh")
     scene_data.matrix = shader("matrix.vert", "matrix.frag", "matrix")
     scene_data.quadSh = shader("screen.vert", "screen.frag", "quad")
+    scene_data.inputs = im
 
     model = glm.translate(model, glm.vec3(0, 0, -5))
     model = glm.scale(model, glm.vec3(10))

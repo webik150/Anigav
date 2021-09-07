@@ -4,7 +4,7 @@ uniform highp mat4  mPVM;   // transformation matrix
 uniform lowp  float bpm;
 uniform highp  float time;
 uniform lowp  int mode;
-uniform lowp  float val1;
+uniform lowp  float analog0;
 uniform lowp  float val2;
 uniform lowp  float val3;
 varying mediump vec4 color;

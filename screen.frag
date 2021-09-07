@@ -10,10 +10,10 @@ uniform vec2 screenSize;
 uniform lowp  int mode;
 varying vec2 v_texcoord;
 
+uniform highp float  analog0;
 uniform highp float  analog1;
 uniform highp float  analog2;
 uniform highp float  analog3;
-uniform highp float  analog4;
 
 //Rotates a vector by angle
 mat2 rot(float angle) {
