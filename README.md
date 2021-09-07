@@ -1,5 +1,5 @@
 # AnIGAV
-### ANalog Input Generates Audio Visuals
+### ANalog-Input-Generated Audio Visuals
 
 This project aims to create a RPiZero-powered OpenGL visualizer controllable by Eurorack CVs.
 
