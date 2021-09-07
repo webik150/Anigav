@@ -3,7 +3,7 @@
 uniform highp mat4  mPVM;   // transformation matrix
 uniform lowp  float bpm;   // transformation matrix
 uniform lowp  float time;   // transformation matrix
-uniform lowp  float val1;   // transformation matrix
+uniform lowp  float analog0;   // transformation matrix
 uniform lowp  float val2;   // transformation matrix
 uniform lowp  float val3;   // transformation matrix
 varying mediump vec4 color;
@@ -11,7 +11,7 @@ varying mediump vec4 color;
 void main()
 {
     mediump float strength = pow(gl_FragCoord.w*3.0, 5.0);
-    mediump vec3 col = vec3((val1+1.0)/2.0, 0, (val1+1.0)/2.0);
+    mediump vec3 col = vec3((analog0+1.0)/2.0, 0, (analog0+1.0)/2.0);
     if (strength>val2){
         discard;
     }
