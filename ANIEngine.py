@@ -123,7 +123,7 @@ def aniInit():
     settings.projection = glm.mat4(1)
     settings.world = glm.mat4(1)
     pg.init()
-    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL, display=1 if DEBUG else 0)
+    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL)
     settings.resolution = pg.display.get_window_size()
     settings.render_res = 400
     # glEnableClientState(GL_VERTEX_ARRAY)

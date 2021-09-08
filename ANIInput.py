@@ -27,7 +27,7 @@ from typing import List
 
 
 def convert_range(value, oldmin, oldmax, newmin, newmax):
-    return (((value - oldmin) * (newmax - newmin)) / (max(oldmax, 0.01) - oldmin)) + newmin
+    return (((value - oldmin) * (newmax - newmin)) / max(oldmax - oldmin, 0.01)) + newmin
 
 
 class InputChannel:
