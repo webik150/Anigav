@@ -82,8 +82,7 @@ def listener_thread(channels: List[InputChannel]):
         cs = digitalio.DigitalInOut(board.D5)
         mcp = MCP.MCP3004(spi, cs)
         ins = [AnalogIn(mcp, ch.pin_number) for ch in channels]
-    print(ins)
-    print(ins[0].voltage)
+    # print(ins[0].voltage)
     global ANI_STOPPING_THREADS
     while not ANI_STOPPING_THREADS:
         i = 0
@@ -115,7 +114,7 @@ class InputManager:
             self.thread.start()
 
     def stop(self):
-        if self.thread:
+        if self.thread is not None:
             global ANI_STOPPING_THREADS
             ANI_STOPPING_THREADS = True
             self.thread.join()

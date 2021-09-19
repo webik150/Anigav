@@ -7,6 +7,9 @@ import glm
 import pywavefront as pf
 from ctypes import c_void_p
 
+from ANIInput import InputManager
+from ANIScene import SceneData
+
 DEBUG = False
 
 
@@ -55,11 +58,28 @@ class shader:
         self.name = name
         shaders[self.name] = self
         self.load()
+        self.locations = {}
+        self.reload_locations()
 
     def delete(self):
         glDeleteShader(self.fragId)
         glDeleteShader(self.vertexId)
         glDeleteProgram(self.id)
+
+    def reload_locations(self):
+        self.locations["mPVM"] = glGetUniformLocation(self.id, "mPVM")
+        self.locations["bpm"] = glGetUniformLocation(self.id, "bpm")
+        self.locations["analog0"] = glGetUniformLocation(self.id, "analog0")
+        self.locations["analog1"] = glGetUniformLocation(self.id, "analog1")
+        self.locations["analog2"] = glGetUniformLocation(self.id, "analog2")
+        self.locations["analog3"] = glGetUniformLocation(self.id, "analog3")
+        self.locations["time"] = glGetUniformLocation(self.id, "time")
+
+    def set_float(self, key, value):
+        glUniform1f(self.locations[key], value)
+
+    def set_matrix(self, key, value):
+        glUniformMatrix4fv(self.locations[key], 1, False, value)
 
     def load(self):
         global shaders
@@ -108,10 +128,52 @@ class shader:
 
 class aniSettings:
     def __init__(self):
+        self.inputs = InputManager()
+        self.inputs.start()
+        self.bpm = 120
         self.resolution = (0, 0)
         self.timeSinceStart = 0
         self.clock = pg.time.Clock()
         self.vao = 0
+        self.currentScene = None
+
+
+class GameObject:
+    def __init__(self, shd: shader, msh: mesh):
+        self.shader = shd
+        self.mesh = msh
+        self.model = glm.mat4(1)
+        self.wireframe = False
+
+    def bind_edges(self):
+        glUseProgram(self.shader.id)
+        self.mesh.bind_edges()
+        glEnableVertexAttribArray(glGetAttribLocation(self.shader.id, "position"))
+        glVertexAttribPointer(glGetAttribLocation(self.shader.id, "position"), 3, GL_FLOAT, False, 0, c_void_p(0))
+
+    def bind_faces(self):
+        glUseProgram(self.shader.id)
+        self.mesh.bind_faces()
+        glEnableVertexAttribArray(glGetAttribLocation(self.shader.id, "position"))
+        glVertexAttribPointer(glGetAttribLocation(self.shader.id, "position"), 3, GL_FLOAT, False, 0, c_void_p(0))
+
+    def set_default_uniforms(self, data: SceneData, settings: aniSettings):
+        self.shader.set_matrix("mPVM", (data.projection * data.world * self.model).to_list())
+        self.shader.set_float("bpm", settings.bpm)
+        self.shader.set_float("analog0", settings.inputs.channels[0].get_value())
+        self.shader.set_float("analog1", settings.inputs.channels[1].get_value())
+        self.shader.set_float("analog2", settings.inputs.channels[2].get_value())
+        self.shader.set_float("analog3", settings.inputs.channels[3].get_value())
+        self.shader.set_float("time", settings.timeSinceStart)
+
+    @staticmethod
+    def unbind():
+        mesh.unbind()
+
+    @staticmethod
+    def from_file(path, shader_name, settings):
+        msh = load_obj(path, settings.vao)
+        return GameObject(shaders[shader_name], msh[0])
 
 
 shaders = {}
@@ -123,7 +185,7 @@ def aniInit():
     settings.projection = glm.mat4(1)
     settings.world = glm.mat4(1)
     pg.init()
-    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL)
+    pg.display.set_mode(size=(0, 0), flags=FULLSCREEN | DOUBLEBUF | OPENGL, display=1)
     settings.resolution = pg.display.get_window_size()
     settings.render_res = 400
     # glEnableClientState(GL_VERTEX_ARRAY)
@@ -133,7 +195,7 @@ def aniInit():
     glEnable(GL_CULL_FACE)
     glEnable(GL_DEPTH_TEST)
     glPointSize(5.0)
-    glLineWidth(0.5)
+    glLineWidth(1.0)
     return settings
 
 
@@ -194,12 +256,14 @@ def load_obj_at_path(name, path, vao):
     return meshes
 
 
+# Setups rendering to a frame buffer.
 def initRenderBuffers(settings):
-    settings.fbo = glGenFramebuffers(1)
-    settings.fgt = glGenTextures(1)
-    settings.dbo = glGenRenderbuffers(1)
-    settings.dfbo = glGetIntegerv(GL_FRAMEBUFFER_BINDING)
+    settings.fbo = glGenFramebuffers(1)  # Frame buffer
+    settings.fgt = glGenTextures(1)  # Textures
+    settings.dbo = glGenRenderbuffers(1)  # Render buffer
+    settings.dfbo = glGetIntegerv(GL_FRAMEBUFFER_BINDING)  # Frame buffer id
 
+    # Make the texture crisp
     glBindTexture(GL_TEXTURE_2D, settings.fgt)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -208,13 +272,16 @@ def initRenderBuffers(settings):
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, settings.render_res, settings.render_res, 0, GL_RGBA, GL_UNSIGNED_BYTE,
                  c_void_p(0))
 
+    # Bind render buffer
     glBindRenderbuffer(GL_RENDERBUFFER, settings.dbo)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, settings.render_res, settings.render_res)
 
+    # Connect a frame buffer to the texture and the render buffer
     glBindFramebuffer(GL_FRAMEBUFFER, settings.fbo)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, settings.fgt, 0)
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, settings.dbo)
 
+    # Unbind
     glBindTexture(GL_TEXTURE_2D, 0)
     glBindRenderbuffer(GL_RENDERBUFFER, 0)
     glBindFramebuffer(GL_FRAMEBUFFER, 0)

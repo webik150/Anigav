@@ -15,6 +15,6 @@ uniform highp float  analog3;
 void main()
 {
     v_texcoord = a_texcoord;
-    vec3 pos = a_position.xyz * max(abs(pow(analog2,2.0)),0.4);
+    vec3 pos = a_position.xyz /** max(abs(pow(analog2,2.0)),0.4)*/;
     gl_Position = vec4( pos, 1 );
 }

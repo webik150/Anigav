@@ -2,9 +2,7 @@
 channels:
   - defaults
 dependencies:
-  - numpy
   - pyopengl==3.1.1a1
-  - python
   - pip:
     - adafruit-blinka>=6.13.0
     - adafruit-circuitpython-mcp3xxx>=1.4.5

@@ -74,8 +74,9 @@ void main()
         vec2 uv = (fragCoord - vec2(1920.0,1080.0) * .5) / 1080.0;
         float t = time;
         vec3 col = fractal(gl_FragCoord.xy);
-        gl_FragColor = mix(mix(texColor, vec4(0.0), col.z), vec4(col,1.0),texColor.r);
+        gl_FragColor = mix(mix(texColor, vec4(1.0)-texColor, col.z), vec4(col,1.0),texColor.r);
         //gl_FragColor = vec4(col, 1.0);
+        gl_FragColor = texColor;
     }else if(mode == 1){
         vec4 texColor = texture2D( s_diffuse, v_texcoord.st );
         if(texColor.w > 0.0){
@@ -87,5 +88,8 @@ void main()
             vec3 col = fractal(gl_FragCoord.xy);
             gl_FragColor = mix(texColor, vec4(col, 1.0), col.z);
         }
+    }else if(mode == 2){
+        vec4 texColor = texture2D( s_diffuse, v_texcoord.st );
+        gl_FragColor = texColor;
     }
 }
